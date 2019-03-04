@@ -1,4 +1,4 @@
-# bip38
+# city-bip38
 
 [![build status](https://secure.travis-ci.org/bitcoinjs/bip38.svg)](http://travis-ci.org/bitcoinjs/bip38)
 [![Coverage Status](https://img.shields.io/coveralls/cryptocoinjs/bip38.svg)](https://coveralls.io/r/cryptocoinjs/bip38)
@@ -8,10 +8,16 @@
 
 A JavaScript component that adheres to the [BIP38](https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki) standard to secure your crypto currency private keys. Fully compliant with Node.js and the browser (via Browserify).
 
+**city-bip38** is a fork of the original **bip38**, with added support for alternative networks (bip38 only supports bitcoin main network) and relies on an async library for scrypt, making it more performant.
+
+## Performance:
+
+**Intel Core i7-8700K**
+- bip38: ~8700ms
+- bip38-network: ~430ms
 
 ## Why?
-BIP38 is a standard process to encrypt Bitcoin and crypto currency private keys that is impervious to brute force attacks thus protecting the user.
-
+BIP38 is a standard process to encrypt Bitcoin and crypto currency private keys that is imprevious to brute force attacks thus protecting the user.
 
 ## Package Info
 - homepage: [http://cryptocoinjs.com/modules/currency/bip38/](http://cryptocoinjs.com/modules/currency/bip38/)
@@ -26,21 +32,23 @@ BIP38 is a standard process to encrypt Bitcoin and crypto currency private keys 
 
 ### Installation
 
-    npm install --save bip38
+    npm install city-bip38
 
 
 ### API
 ### encrypt(buffer, compressed, passphrase[, progressCallback, scryptParams])
 
 ``` javascript
-var bip38 = require('bip38')
+var bip38 = require('city-bip38')
 var wif = require('wif')
 
 var myWifString = '5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR'
 var decoded = wif.decode(myWifString)
 
-var encryptedKey = bip38.encrypt(decoded.privateKey, decoded.compressed, 'TestingOneTwoThree')
+bip38.encryptAsync(decoded.privateKey, decoded.compressed, 'TestingOneTwoThree', (encryptedKey) => {
 console.log(encryptedKey)
+})
+
 // => '6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg'
 ```
 
@@ -48,12 +56,12 @@ console.log(encryptedKey)
 ### decrypt(encryptedKey, passphrase[, progressCallback, scryptParams])
 
 ``` javascript
-var bip38 = require('bip38')
+var bip38 = require('city-bip38')
 var wif = require('wif')
 
 var encryptedKey = '6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg'
-var decryptedKey = bip38.decrypt(encryptedKey, 'TestingOneTwoThree', function (status) {
-  console.log(status.percent) // will print the percent every time current increases by 1000
+bip38.decryptAsync(encryptedKey, 'TestingOneTwoThree', function (decryptedKey) {
+  console.log(decryptedKey)
 })
 
 console.log(wif.encode(0x80, decryptedKey.privateKey, decryptedKey.compressed))
@@ -67,4 +75,3 @@ console.log(wif.encode(0x80, decryptedKey.privateKey, decryptedKey.compressed))
 - https://github.com/casascius/Bitcoin-Address-Utility/tree/master/Model
 - https://github.com/nomorecoin/python-bip38-testing/blob/master/bip38.py
 - https://github.com/pointbiz/bitaddress.org/blob/master/src/ninja.key.js
-
